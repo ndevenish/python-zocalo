@@ -6,7 +6,7 @@ import functools
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, TypeVar
 
 import requests
 import yaml
@@ -96,6 +96,33 @@ def _(comp: BindingSpec) -> bool:
     if comp.source == "" or "amq." in comp.source:
         return True
     return False
+
+
+M = TypeVar("M", bound=BaseModel)
+
+
+def update_config_replace_if_possible(
+    api: RabbitMQAPI,
+    incoming: list[M],
+    current: List[M],
+    key: str,
+    safe_delete_only: bool = True,
+) -> None:
+    """
+    Update configuration, but don't blindly delete - update if possible.
+
+    update_config blindly deletes and recreates a resource
+
+    Args:
+        api: The RabbitMQ API object
+        incoming: The declared set of objects, from configuration.
+        current: The currently existing set of objects on the server.
+        key: The key field to distinguish between non-matching objects
+        safe_delete_only:
+            If it's not possible to update, do a "Safe" delete - that
+            is, tell the server only to delete if there
+    """
+    pass
 
 
 def update_config(
